@@ -1,0 +1,82 @@
+# config.yaml
+
+main:
+  project_name: exercise_14        # switch to genre_classification_prod for prod run
+  experiment_name: dev
+  execute_steps:
+    - download
+    - preprocess
+    - check_data
+    - segregate
+    - random_forest
+    - evaluate
+  random_seed: 42
+
+data:
+  file_url: "https://github.com/udacity/.../genres_mod.parquet?raw=true"
+  reference_dataset: "exercise_14/preprocessed_data.csv:latest"
+  ks_alpha: 0.05
+  test_size: 0.3
+  val_size: 0.3
+  stratify: genre
+
+random_forest_pipeline:
+  random_forest:
+    n_estimators: 100
+    max_depth: 13
+    random_state: 42
+    class_weight: "balanced"
+    # …other RF params…
+  tfidf:
+    max_features: 10
+  features:
+    numerical:
+      - danceability
+      - energy
+      - loudness
+      - speechiness
+      - acousticness
+      - instrumentalness
+      - liveness
+      - valence
+      - tempo
+      - duration_ms
+    categorical:
+      - time_signature
+      - key
+    nlp:
+      - text_feature
+
+# Step 1: download raw data
+download:
+  output_artifact: "raw_data:latest"
+  artifact_type: "raw_data"
+
+# Step 2: preprocess the raw data
+preprocess:
+  input_artifact:  "raw_data:latest"
+  output_artifact: "preprocessed_data:latest"
+  artifact_type:  "preprocessed_data"
+
+# Step 3: data quality checks
+check_data:
+  input_artifact:  "preprocessed_data:latest"
+  output_artifact: "checked_data:latest"
+  artifact_type:  "checked_data"
+
+# Step 4: split into train/test
+segregate:
+  input_artifact:  "checked_data:latest"
+  output_artifact: "train_test_data:latest"
+  artifact_type:  "data_splits"
+
+# Step 5: train & export model
+random_forest:
+  input_artifact:  "train_test_data:latest"
+  output_artifact: "model_export:latest"
+  artifact_type:  "model_export"
+
+# Step 6: evaluate exported model
+evaluate:
+  model_export: "model_export:latest"
+  test_data:    "train_test_data:latest"
