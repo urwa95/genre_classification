@@ -72,6 +72,7 @@ def go(args):
     fig_feat_imp = plot_feature_importance(pipe)
 
     fig_cm, sub_cm = plt.subplots(figsize=(10, 10))
+
     y_pred = pipe.predict(X_val)
 
     cm = confusion_matrix(

@@ -1,91 +1,117 @@
-import os
 import mlflow
+import os
 import hydra
-from omegaconf import DictConfig
+import wandb
+from omegaconf import DictConfig, OmegaConf
 
-# Absolute path to this script's directory (repo root)
-top_dir = os.path.abspath(os.path.dirname(__file__))
 
-@hydra.main(config_path=".", config_name="config")
-def go(cfg: DictConfig):
-    runs = {}
-    project = cfg.main.project_name
+# This automatically reads in the configuration
+@hydra.main(config_name='config')
+def go(config: DictConfig):
 
-    # Step 1: Download raw data
-    if "download" in cfg.main.execute_steps:
-        runs["download"] = mlflow.run(
-            uri=os.path.join(top_dir, "download"),
-            entry_point="main",
+    wandb.config = OmegaConf.to_container(
+         config, 
+         resolve=True, 
+         throw_on_missing=True
+    )
+
+    # Setup the wandb experiment. All runs will be grouped under this name
+    os.environ["WANDB_PROJECT"] = config["main"]["project_name"]
+    os.environ["WANDB_RUN_GROUP"] = config["main"]["experiment_name"]
+
+    # You can get the path at the root of the MLflow project with this:
+    root_path = hydra.utils.get_original_cwd()
+
+    # Check which steps we need to execute
+    if isinstance(config["main"]["execute_steps"], str):
+        # This was passed on the command line as a comma-separated list of steps
+        steps_to_execute = config["main"]["execute_steps"].split(",")
+    else:
+
+        steps_to_execute = list(config["main"]["execute_steps"])
+
+    # Download step
+    if "download" in steps_to_execute:
+
+        _ = mlflow.run(
+            os.path.join(root_path, "download"),
+            "main",
             parameters={
-                "file_url":            cfg.data.file_url,
-                "artifact_name":       cfg.download.output_artifact,
-                "artifact_description":"Raw dataset downloaded from source",
+                "file_url": config["data"]["file_url"],
+                "artifact_name": "raw_data.parquet",
+                "artifact_type": "raw_data",
+                "artifact_description": "Data as downloaded"
             },
         )
 
-    # Step 2: Preprocess downloaded data
-    if "preprocess" in cfg.main.execute_steps:
-        runs["preprocess"] = mlflow.run(
-            uri=os.path.join(top_dir, "preprocess"),
-            entry_point="main",
+    if "preprocess" in steps_to_execute:
+        _ = mlflow.run(
+            os.path.join(root_path, "preprocess"),
+            "main",
             parameters={
-                "input_artifact":       cfg.preprocess.input_artifact,
-                "artifact_name":        cfg.preprocess.output_artifact.split(":")[0],
-                "artifact_type":        cfg.preprocess.artifact_type,
-                "artifact_description": "Data after preprocessing (cleaning, imputing, feature derivation)",
+                "input_artifact": "raw_data.parquet:latest",
+                "artifact_name": "preprocessed_data.csv",
+                "artifact_type": "preprocessed_data",
+                "artifact_description": "Data with preprocessing applied"
             },
         )
 
-    # Step 3: Check data quality
-    if "check_data" in cfg.main.execute_steps:
-        runs["check_data"] = mlflow.run(
-            uri=os.path.join(top_dir, "check_data"),
-            entry_point="main",
+    if "check_data" in steps_to_execute:
+        _ = mlflow.run(
+            os.path.join(root_path, "check_data"),
+            "main",
             parameters={
-                "project_name":    project,
-                "input_artifact":  cfg.check_data.input_artifact,
-                "output_artifact": cfg.check_data.output_artifact,
-                "artifact_type":   cfg.check_data.artifact_type,
+                "reference_artifact": config["data"]["reference_dataset"],
+                "sample_artifact": "preprocessed_data.csv:latest",
+                "ks_alpha": config["data"]["ks_alpha"]
             },
         )
 
-    # Step 4: Split into train/test
-    if "segregate" in cfg.main.execute_steps:
-        runs["segregate"] = mlflow.run(
-            uri=os.path.join(top_dir, "segregate"),
-            entry_point="main",
+    if "segregate" in steps_to_execute:
+
+        _ = mlflow.run(
+            os.path.join(root_path, "segregate"),
+            "main",
             parameters={
-                "project_name":    project,
-                "input_artifact":  cfg.segregate.input_artifact,
-                "output_artifact": cfg.segregate.output_artifact,
-                "artifact_type":   cfg.segregate.artifact_type,
+                "input_artifact": "preprocessed_data.csv:latest",
+                "artifact_root": "data",
+                "artifact_type": "segregated_data",
+                "test_size": config["data"]["test_size"],
+                "stratify": config["data"]["stratify"]
             },
         )
 
-    # Step 5: Train and export model
-    if "random_forest" in cfg.main.execute_steps:
-        runs["random_forest"] = mlflow.run(
-            uri=os.path.join(top_dir, "random_forest"),
-            entry_point="main",
+    if "random_forest" in steps_to_execute:
+        # Serialize decision tree configuration
+        model_config = os.path.abspath("random_forest_config.yml")
+
+        with open(model_config, "w+") as fp:
+            fp.write(OmegaConf.to_yaml(config["random_forest_pipeline"]))
+
+        _ = mlflow.run(
+            os.path.join(root_path, "random_forest"),
+            "main",
             parameters={
-                "project_name":    project,
-                "input_artifact":  cfg.random_forest.input_artifact,
-                "output_artifact": cfg.random_forest.output_artifact,
-                "artifact_type":   cfg.random_forest.artifact_type,
+                "train_data": "data_train.csv:latest",
+                "model_config": model_config,
+                "export_artifact": config["random_forest_pipeline"]["export_artifact"],
+                "random_seed": config["main"]["random_seed"],
+                "val_size": config["data"]["test_size"],
+                "stratify": config["data"]["stratify"]
             },
         )
 
-    # Step 6: Evaluate exported model
-    if "evaluate" in cfg.main.execute_steps:
-        runs["evaluate"] = mlflow.run(
-            uri=os.path.join(top_dir, "evaluate"),
-            entry_point="main",
+    if "evaluate" in steps_to_execute:
+
+        _ = mlflow.run(
+            os.path.join(root_path, "evaluate"),
+            "main",
             parameters={
-                "project_name": project,
-                "model_export": cfg.evaluate.model_export,
-                "test_data":    cfg.evaluate.test_data,
+                "model_export": f"{config['random_forest_pipeline']['export_artifact']}:latest",
+                "test_data": "data_test.csv:latest"
             },
         )
+
 
 if __name__ == "__main__":
     go()
