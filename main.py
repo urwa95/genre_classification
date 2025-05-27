@@ -6,7 +6,7 @@ from omegaconf import DictConfig
 # Absolute path to this script's directory (repo root)
 top_dir = os.path.abspath(os.path.dirname(__file__))
 
-@hydra.main(config_path=".", config_name="config")
+@hydra.main(config_path="conf", config_name="config")
 def go(cfg: DictConfig):
     runs = {}
     project = cfg.main.project_name
