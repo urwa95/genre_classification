@@ -1,0 +1,15 @@
+artifact_uri: file:///mnt/c/VS_code_files/excercise_course3/exercise14/mlruns/0/a002a453bfcb4456bf2b2326d3f1f2fb/artifacts
+end_time: 1748362614051
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: a002a453bfcb4456bf2b2326d3f1f2fb
+run_name: carefree-fly-66
+run_uuid: a002a453bfcb4456bf2b2326d3f1f2fb
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1748362593036
+status: 3
+tags: []
+user_id: urwah

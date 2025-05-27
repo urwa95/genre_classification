@@ -1,0 +1,2 @@
+- main.execute_steps='download,preprocess,check_data,segregate,random_forest,evaluate'
+- main.project_name=exercise_14

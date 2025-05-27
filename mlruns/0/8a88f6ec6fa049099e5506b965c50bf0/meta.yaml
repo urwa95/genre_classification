@@ -1,0 +1,15 @@
+artifact_uri: file:///mnt/c/VS_code_files/excercise_course3/exercise14/mlruns/0/8a88f6ec6fa049099e5506b965c50bf0/artifacts
+end_time: 1748362614703
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: 8a88f6ec6fa049099e5506b965c50bf0
+run_name: adorable-sponge-982
+run_uuid: 8a88f6ec6fa049099e5506b965c50bf0
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1748362590315
+status: 4
+tags: []
+user_id: urwah

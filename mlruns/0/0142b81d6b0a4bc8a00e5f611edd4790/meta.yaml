@@ -1,0 +1,15 @@
+artifact_uri: file:///mnt/c/VS_code_files/excercise_course3/exercise14/mlruns/0/0142b81d6b0a4bc8a00e5f611edd4790/artifacts
+end_time: 1748356879644
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: 0142b81d6b0a4bc8a00e5f611edd4790
+run_name: enthused-snail-313
+run_uuid: 0142b81d6b0a4bc8a00e5f611edd4790
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1748356877945
+status: 4
+tags: []
+user_id: urwah

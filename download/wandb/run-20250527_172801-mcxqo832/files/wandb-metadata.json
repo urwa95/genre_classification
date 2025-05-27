@@ -1,0 +1,89 @@
+{
+    "os": "Linux-5.15.167.4-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+    "python": "3.10.17",
+    "heartbeatAt": "2025-05-27T15:28:02.947262",
+    "startedAt": "2025-05-27T15:28:01.676981",
+    "docker": null,
+    "cuda": null,
+    "args": [
+        "--file_url",
+        "https://github.com/udacity/.../genres_mod.parquet?raw=true",
+        "--artifact_name",
+        "raw_data:latest",
+        "--artifact_type",
+        "raw_data",
+        "--artifact_description",
+        "Raw dataset downloaded from source"
+    ],
+    "state": "running",
+    "program": "/mnt/c/VS_code_files/excercise_course3/exercise14/download/download_data.py",
+    "codePathLocal": "download_data.py",
+    "codePath": "download/download_data.py",
+    "git": {
+        "remote": "git@github.com:urwa95/genre_classification.git",
+        "commit": "4c56a797c981de1bac599cb926a13c43bb9785b6"
+    },
+    "email": "urwah.khatoon@rwth-aachen.de",
+    "root": "/mnt/c/VS_code_files/excercise_course3/exercise14",
+    "host": "lappytoppy",
+    "username": "urwah",
+    "executable": "/home/urwah/miniconda3/envs/mlflow-e190ff1f176d660e6839ac34c7d6bc74393e2ccd/bin/python",
+    "cpu_count": 4,
+    "cpu_count_logical": 8,
+    "cpu_freq": {
+        "current": 2694.864,
+        "min": 0.0,
+        "max": 0.0
+    },
+    "cpu_freq_per_core": [
+        {
+            "current": 2694.864,
+            "min": 0.0,
+            "max": 0.0
+        },
+        {
+            "current": 2694.864,
+            "min": 0.0,
+            "max": 0.0
+        },
+        {
+            "current": 2694.864,
+            "min": 0.0,
+            "max": 0.0
+        },
+        {
+            "current": 2694.864,
+            "min": 0.0,
+            "max": 0.0
+        },
+        {
+            "current": 2694.864,
+            "min": 0.0,
+            "max": 0.0
+        },
+        {
+            "current": 2694.864,
+            "min": 0.0,
+            "max": 0.0
+        },
+        {
+            "current": 2694.864,
+            "min": 0.0,
+            "max": 0.0
+        },
+        {
+            "current": 2694.864,
+            "min": 0.0,
+            "max": 0.0
+        }
+    ],
+    "disk": {
+        "/": {
+            "total": 1006.853931427002,
+            "used": 17.28632354736328
+        }
+    },
+    "memory": {
+        "total": 3.5730209350585938
+    }
+}
