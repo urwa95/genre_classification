@@ -49,7 +49,7 @@ random_forest_pipeline:
 
 # Step 1: download raw data
 download:
-  output_artifact: "raw_data:latest"
+  output_artifact: "raw_data"
   artifact_type: "raw_data"
 
 # Step 2: preprocess the raw data
